@@ -2,7 +2,6 @@ package ru.hogwarts.school5.service;
 
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Example;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -19,8 +18,8 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import static io.swagger.v3.core.util.AnnotationsUtils.getExtensions;
 
@@ -61,13 +60,13 @@ public class AvatarServiceImpl implements AvatarService {
     @Override
     public Avatar getAvatarPage(Integer pageNumber, Integer pageSize) {
         Pageable request = PageRequest.of(pageNumber, pageSize);
-        return (Avatar) avatarRepository.findAll(request).getContent();
+        return (Avatar) avatarRepository.findAll(request).getContent().get(0);
     }
 
     @Override
     public void uploadAvatar(Long studentId, MultipartFile avatarfile) throws IOException {
-        Student student = studentRepository.getById(studentId);
-        Path filePath = Path.of(avatarsDir, student + "." + getExtension(avatarfile.getOriginalFilename()));
+        Optional<Student> student = studentRepository.findById(studentId);
+        Path filePath = Path.of(avatarsDir, studentId + "_" + student.get().getName() + "." + getExtension(avatarfile.getOriginalFilename()));
         Files.createDirectories(filePath.getParent());
         Files.deleteIfExists(filePath);
         try (
@@ -80,7 +79,7 @@ public class AvatarServiceImpl implements AvatarService {
         }
 
         Avatar avatar = findAvatar(studentId);
-        avatar.setStudent(student);
+        avatar.setStudent(student.get());
         avatar.setFilePath(filePath.toString());
         avatar.setData(generateDataForDB(filePath));
         avatar.setFileSize(avatarfile.getSize());
@@ -102,7 +101,7 @@ public class AvatarServiceImpl implements AvatarService {
             graphics2D.drawImage(image, 0, 0, 100, height, null);
             graphics2D.dispose();
 
-            ImageIO.write(preview, getExtensions(Boolean.parseBoolean(filePath.getFileName().toString())).toString(), baos);
+            ImageIO.write(preview, getExtension(filePath.getFileName().toString()), baos);
             return baos.toByteArray();
         }
     }

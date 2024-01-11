@@ -12,6 +12,8 @@ public class Student {
     private long id;
     private String name;
     private int age;
+    @OneToOne(mappedBy = "student")
+    private Avatar avatar;
     @ManyToOne
     @JoinColumn(name = "faculty_id")
     private Faculty faculty;
@@ -75,9 +77,6 @@ public class Student {
     public void setFaculty(Faculty faculty) {
         this.faculty = faculty;
     }
-
-    @OneToOne(mappedBy = "student", optional = false)
-    private Avatar avatar;
 
     public Avatar getAvatar() {
         return avatar;

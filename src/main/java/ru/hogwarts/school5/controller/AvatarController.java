@@ -1,7 +1,7 @@
 package ru.hogwarts.school5.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
-import org.hibernate.query.Page;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -20,7 +20,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 
 @RestController
 @RequestMapping("/student")
@@ -67,8 +66,8 @@ public class AvatarController {
     }
 
     @GetMapping
-    public List<Avatar> getAvatarPage(int pageNumber, int pageSize) {
+    public Page<Avatar> getAvatarPage(int pageNumber, int pageSize) {
         Pageable request = PageRequest.of(pageNumber, pageSize);
-        return avatarRepository.findAll(request).getContent();
+        return avatarRepository.findAll(request);
     }
 }

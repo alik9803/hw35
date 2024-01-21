@@ -43,4 +43,4 @@ FROM Student
 
 SELECT Student.name, Student.age
 FROM Student
-         JOIN Avatar ON Student.id = Avatar.id;
+         JOIN Avatar ON Student.id = Avatar.student_id;

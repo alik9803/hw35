@@ -1,14 +1,17 @@
 package ru.hogwarts.school5.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.hogwarts.school5.model.Faculty;
 import ru.hogwarts.school5.model.Student;
+import ru.hogwarts.school5.repository.FacultyRepository;
 import ru.hogwarts.school5.service.FacultyService;
 import ru.hogwarts.school5.service.StudentService;
 
 import java.util.Collection;
+import java.util.Comparator;
 
 @RestController
 @RequestMapping("/faculty")
@@ -21,7 +24,18 @@ public class FacultyController {
         this.facultyService = facultyService;
         this.studentService = studentService;
     }
+    @Autowired
+    private FacultyRepository facultyRepository;
 
+    @GetMapping("/faculties/longest-name")
+    public String getFacultyWithLongestName() {
+        String longestName = facultyRepository.findAll().stream()
+                .map(Faculty::getName)
+                .max(Comparator.comparingInt(String::length))
+                .orElse("");
+
+        return longestName;
+    }
     @GetMapping("/search")
     public ResponseEntity<Collection<Faculty>> getFacultiesByNameOrColor(@RequestParam(required = false, defaultValue = "") String name,
                                                                          @RequestParam(required = false, defaultValue = "") String color) {

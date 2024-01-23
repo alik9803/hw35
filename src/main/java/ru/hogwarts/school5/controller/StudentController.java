@@ -31,6 +31,7 @@ public class StudentController {
 
     @Autowired
     private StudentRepository studentRepository;
+
     @GetMapping("/students/names")
     public List<String> getStudentNamesStartingWithA() {
         List<String> studentNames = studentRepository.findAll().stream()
@@ -42,6 +43,7 @@ public class StudentController {
 
         return studentNames;
     }
+
     @GetMapping("/students/average-age-of-students")
     public double getAverageAgeOfStudents() {
         double averageAge = studentRepository.findAll().stream()
@@ -116,6 +118,7 @@ public class StudentController {
     public List<Student> getLastFiveStudents() {
         return studentRepository.getLastFiveStudents();
     }
+
     @GetMapping("/sum")
     public int getSum() {
         int n = 1_000_000;

@@ -24,6 +24,7 @@ public class FacultyController {
         this.facultyService = facultyService;
         this.studentService = studentService;
     }
+
     @Autowired
     private FacultyRepository facultyRepository;
 
@@ -36,6 +37,7 @@ public class FacultyController {
 
         return longestName;
     }
+
     @GetMapping("/search")
     public ResponseEntity<Collection<Faculty>> getFacultiesByNameOrColor(@RequestParam(required = false, defaultValue = "") String name,
                                                                          @RequestParam(required = false, defaultValue = "") String color) {

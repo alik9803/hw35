@@ -8,6 +8,14 @@ import java.util.Collection;
 
 @Service
 public interface StudentService {
+    Collection<Student> findStudentsByAgeBetween(int min, int max);
+
+    Collection<Student> getStudentsByFaculty(Faculty faculty);
+
+    Student createStudent(Student student);
+
+    Student getById(Long studentId);
+
     Student addStudent(Student student);
 
     Student findStudent(Long id);
@@ -17,12 +25,4 @@ public interface StudentService {
     void deleteStudent(Long id);
 
     void getAllStudents();
-
-    Collection<Student> findStudentsByAgeBetween(int min, int max);
-
-    Collection<Student> getStudentsByFaculty(Faculty faculty);
-
-    Student createStudent(Student student);
-
-    Student getById(Long studentId);
 }

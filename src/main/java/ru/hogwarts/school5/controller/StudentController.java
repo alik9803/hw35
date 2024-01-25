@@ -1,22 +1,16 @@
 package ru.hogwarts.school5.controller;
 
-import org.hibernate.query.Page;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.hogwarts.school5.model.Avatar;
 import ru.hogwarts.school5.model.Faculty;
 import ru.hogwarts.school5.model.Student;
 import ru.hogwarts.school5.repository.AvatarRepository;
-import ru.hogwarts.school5.repository.FacultyRepository;
 import ru.hogwarts.school5.repository.StudentRepository;
 import ru.hogwarts.school5.service.FacultyService;
 import ru.hogwarts.school5.service.StudentService;
 
-import java.awt.print.Pageable;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -124,5 +118,62 @@ public class StudentController {
         int n = 1_000_000;
         int sum = (n * (n + 1)) / 2;
         return sum;
+    }
+    @GetMapping("/print-parallel")
+    public void printStudentsInParallel() {
+        List<Student> students = studentService.getAllStudents();
+
+        // Вывод имен первых двух студентов
+        Thread thread1 = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                System.out.println(students.get(0).getName());
+                System.out.println(students.get(1).getName());
+            }
+        });
+
+        // Вывод имен третьего и четвертого студентов
+        Thread thread2 = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                System.out.println(students.get(2).getName());
+                System.out.println(students.get(3).getName());
+            }
+        });
+
+        // Вывод имен пятого и шестого студентов
+        Thread thread3 = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                System.out.println(students.get(4).getName());
+                System.out.println(students.get(5).getName());
+            }
+        });
+
+        // Запуск поток параллельно
+        thread1.start();
+        thread2.start();
+        thread3.start();
+    }
+
+    @GetMapping("/print-synchronized")
+    public synchronized void printStudentsSynchronized() {
+        List<Student> students = studentService.getAllStudents();
+
+        // Вывод имен первых двух студентов
+        System.out.println(students.get(0).getName());
+        System.out.println(students.get(1).getName());
+
+        // Вывод имен третьего и четвертого студентов
+        synchronized (this) {
+            System.out.println(students.get(2).getName());
+            System.out.println(students.get(3).getName());
+        }
+
+        // Вывод имен пятого и шестого студентов
+        synchronized (this) {
+            System.out.println(students.get(4).getName());
+            System.out.println(students.get(5).getName());
+        }
     }
 }

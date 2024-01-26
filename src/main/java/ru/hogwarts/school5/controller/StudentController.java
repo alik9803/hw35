@@ -119,61 +119,14 @@ public class StudentController {
         int sum = (n * (n + 1)) / 2;
         return sum;
     }
+
     @GetMapping("/print-parallel")
-    public void printStudentsInParallel() {
-        List<Student> students = studentService.getAllStudents();
-
-        // Вывод имен первых двух студентов
-        Thread thread1 = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                System.out.println(students.get(0).getName());
-                System.out.println(students.get(1).getName());
-            }
-        });
-
-        // Вывод имен третьего и четвертого студентов
-        Thread thread2 = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                System.out.println(students.get(2).getName());
-                System.out.println(students.get(3).getName());
-            }
-        });
-
-        // Вывод имен пятого и шестого студентов
-        Thread thread3 = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                System.out.println(students.get(4).getName());
-                System.out.println(students.get(5).getName());
-            }
-        });
-
-        // Запуск поток параллельно
-        thread1.start();
-        thread2.start();
-        thread3.start();
+    public void printParallel() {
+        studentService.printParallel();
     }
 
     @GetMapping("/print-synchronized")
-    public synchronized void printStudentsSynchronized() {
-        List<Student> students = studentService.getAllStudents();
-
-        // Вывод имен первых двух студентов
-        System.out.println(students.get(0).getName());
-        System.out.println(students.get(1).getName());
-
-        // Вывод имен третьего и четвертого студентов
-        synchronized (this) {
-            System.out.println(students.get(2).getName());
-            System.out.println(students.get(3).getName());
-        }
-
-        // Вывод имен пятого и шестого студентов
-        synchronized (this) {
-            System.out.println(students.get(4).getName());
-            System.out.println(students.get(5).getName());
-        }
+    public void printSynchronized() {
+        studentService.printSynchronized();
     }
 }

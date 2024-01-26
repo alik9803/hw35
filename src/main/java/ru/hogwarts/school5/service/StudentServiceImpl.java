@@ -1,5 +1,6 @@
 package ru.hogwarts.school5.service;
 
+import jakarta.transaction.Transactional;
 import org.apache.velocity.exception.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,7 +10,7 @@ import ru.hogwarts.school5.model.Faculty;
 import ru.hogwarts.school5.model.Student;
 import ru.hogwarts.school5.repository.StudentRepository;
 
-import java.util.Collection;
+import java.util.*;
 
 @Service
 public class StudentServiceImpl implements StudentService {
@@ -22,22 +23,25 @@ public class StudentServiceImpl implements StudentService {
         this.studentRepository = studentRepository;
     }
 
-@Override
+    @Override
     public Collection<Student> findStudentsByAgeBetween(int min, int max) {
         logger.info("Invoked findStudentsByAgeBetween method");
         return studentRepository.findByAgeBetween(min, max);
     }
-@Override
+
+    @Override
     public Collection<Student> getStudentsByFaculty(Faculty faculty) {
         logger.info("Invoked getStudentsByFaculty method");
         return studentRepository.findByFaculty(faculty);
     }
-@Override
+
+    @Override
     public Student createStudent(Student student) {
         logger.info("Invoked createStudent method");
         return studentRepository.save(student);
     }
-@Override
+
+    @Override
     public Student getById(Long studentId) {
         logger.info("Invoked getById method");
         return studentRepository.findById(studentId)
@@ -46,17 +50,20 @@ public class StudentServiceImpl implements StudentService {
                     return new ResourceNotFoundException("Student not found with id: " + studentId);
                 });
     }
-@Override
+
+    @Override
     public Student addStudent(Student student) {
         logger.info("Invoked addStudent method");
         return studentRepository.save(student);
     }
-@Override
+
+    @Override
     public Student findStudent(Long id) {
         logger.info("Invoked findStudent method");
         return studentRepository.findById(id).orElse(new Student());
     }
-@Override
+
+    @Override
     public Student editStudent(Long id, Student student) {
         logger.info("Invoked editStudent method");
         return studentRepository.findById(id)
@@ -71,14 +78,73 @@ public class StudentServiceImpl implements StudentService {
                     return new ResourceNotFoundException("Student not found with id: " + id);
                 });
     }
-@Override
+
+    @Override
     public void deleteStudent(Long id) {
         logger.info("Invoked deleteStudent method");
         studentRepository.deleteById(id);
     }
-@Override
-    public void getAllStudents() {
+
+    @Override
+    public List<Student> getAllStudents() {
         logger.info("Invoked getAllStudents method");
-        studentRepository.findAll().forEach(System.out::println);
+        List<Student> students = studentRepository.findAll();
+        students.forEach(System.out::println);
+        return students;
+    }
+
+    @Transactional
+    public void printParallel() {
+        List<Student> all = studentRepository.findAll().stream()
+                .sorted(Comparator.comparing(Student::getId))
+                .limit(6)
+                .toList();
+
+        printStudent(all.get(0));
+        printStudent(all.get(1));
+        new Thread(() -> {
+
+            printStudent(all.get(2));
+            printStudent(all.get(3));
+
+        }).start();
+        new Thread(() -> {
+            printStudent(all.get(4));
+            printStudent(all.get(5));
+        }).start();
+    }
+
+    private void printStudent(Student student) {
+        System.out.println(student);
+    }
+
+    @Transactional
+    public void printSynchronized() {
+        Queue<Student> all = new LinkedList<>(studentRepository.findAll().stream()
+                .sorted(Comparator.comparing(Student::getId))
+                .limit(6)
+                .toList());
+
+        printStudentSynchronized(all.poll());
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        printStudentSynchronized(all.poll());
+
+        new Thread(() -> {
+            printStudentSynchronized(all.poll());
+            printStudentSynchronized(all.poll());
+        }).start();
+
+        new Thread(() -> {
+            printStudentSynchronized(all.poll());
+            printStudentSynchronized(all.poll());
+        }).start();
+    }
+
+    private synchronized void printStudentSynchronized(Student student) {
+        System.out.println(student);
     }
 }

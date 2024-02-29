@@ -1,11 +1,8 @@
 package ru.hogwarts.school5.controller;
 
-import org.hibernate.query.Page;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.hogwarts.school5.model.Avatar;
 import ru.hogwarts.school5.model.Faculty;
 import ru.hogwarts.school5.model.Student;
 import ru.hogwarts.school5.repository.AvatarRepository;
@@ -13,9 +10,9 @@ import ru.hogwarts.school5.repository.StudentRepository;
 import ru.hogwarts.school5.service.FacultyService;
 import ru.hogwarts.school5.service.StudentService;
 
-import java.awt.print.Pageable;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/student")
@@ -25,6 +22,32 @@ public class StudentController {
     private final FacultyService facultyService;
     @Autowired
     private AvatarRepository avatarRepository;
+
+    @Autowired
+    private StudentRepository studentRepository;
+
+    @GetMapping("/students/names")
+    public List<String> getStudentNamesStartingWithA() {
+        List<String> studentNames = studentRepository.findAll().stream()
+                .map(Student::getName)
+                .filter(name -> name.startsWith("A"))
+                .map(String::toUpperCase)
+                .sorted()
+                .collect(Collectors.toList());
+
+        return studentNames;
+    }
+
+    @GetMapping("/students/average-age-of-students")
+    public double getAverageAgeOfStudents() {
+        double averageAge = studentRepository.findAll().stream()
+                .mapToInt(Student::getAge)
+                .average()
+                .orElse(0);
+
+        return averageAge;
+    }
+
 
     public StudentController(StudentService studentService, FacultyService facultyService) {
         this.studentService = studentService;
@@ -75,15 +98,12 @@ public class StudentController {
         return ResponseEntity.ok().build();
     }
 
-    @Autowired
-    private StudentRepository studentRepository;
-
     @GetMapping("/students/count")
     public int getTotalStudentsCount() {
         return studentRepository.getTotalStudentsCount();
     }
 
-    @GetMapping("/students/average-age")
+    @GetMapping("/students/average-student-age")
     public double getAverageStudentAge() {
         return studentRepository.getAverageStudentAge();
     }
@@ -91,5 +111,22 @@ public class StudentController {
     @GetMapping("/students/last-five")
     public List<Student> getLastFiveStudents() {
         return studentRepository.getLastFiveStudents();
+    }
+
+    @GetMapping("/sum")
+    public int getSum() {
+        int n = 1_000_000;
+        int sum = (n * (n + 1)) / 2;
+        return sum;
+    }
+
+    @GetMapping("/print-parallel")
+    public void printParallel() {
+        studentService.printParallel();
+    }
+
+    @GetMapping("/print-synchronized")
+    public void printSynchronized() {
+        studentService.printSynchronized();
     }
 }

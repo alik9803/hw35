@@ -5,6 +5,7 @@ import ru.hogwarts.school5.model.Faculty;
 import ru.hogwarts.school5.model.Student;
 
 import java.util.Collection;
+import java.util.List;
 
 @Service
 public interface StudentService {
@@ -24,5 +25,9 @@ public interface StudentService {
 
     void deleteStudent(Long id);
 
-    void getAllStudents();
+    List<Student> getAllStudents();
+
+    void printParallel();
+
+    void printSynchronized();
 }
